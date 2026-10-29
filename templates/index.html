@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Disease Diagnosis Prototype & Patient Portal</title>
+  <link rel="stylesheet" href="/static/style.css?v=101">
+</head>
+
+<body>
+  <header>
+    <div class="brand-wrapper">
+      <span class="brand-icon">🏥</span>
+      <div>
+        <h1 id="title">AI Disease Diagnosis</h1>
+        <p id="subtitle">ML clinical decision-support & specialist recommendation</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div id="authNav" class="auth-nav">
+        <!-- Guest Navigation Controls -->
+        <div id="guestControls" class="auth-btn-group">
+          <button id="navLoginBtn" type="button" class="auth-btn secondary-btn" onclick="showAuthTab('login')">🔑 <span
+              id="loginLabel">Login</span></button>
+          <button id="navRegisterBtn" type="button" class="auth-btn primary-btn" onclick="showAuthTab('register')">📝
+            <span id="registerLabel">Register</span></button>
+        </div>
+        <!-- User Profile Controls (when logged in) -->
+        <div id="userControls" class="auth-btn-group" hidden>
+          <div class="user-badge" id="userBadge">
+            <span class="user-avatar">👤</span>
+            <span id="userNameDisplay" class="user-name">User</span>
+          </div>
+          <button id="navProfileBtn" type="button" class="auth-btn secondary-btn" onclick="openModal('profileModal')">📋
+            <span id="profileLabel">Profile</span></button>
+          <button id="navLogoutBtn" type="button" class="auth-btn logout-btn" onclick="handleLogout()">🚪 <span
+              id="logoutLabel">Logout</span></button>
+        </div>
+      </div>
+
+      <button id="navRefreshBtn" type="button" class="auth-btn secondary-btn refresh-btn"
+        onclick="handleRefreshPortal()" title="Refresh Page & Reset Form">
+        🔄 <span id="refreshLabel">Refresh</span>
+      </button>
+
+      <select id="language" aria-label="Language">
+        <option value="en">English</option>
+        <option value="kn">ಕನ್ನಡ</option>
+        <option value="hi">हिन्दी</option>
+        <option value="te">తెలుగు</option>
+        <option value="ta">தமிழ்</option>
+        <option value="ml">മലയാളം</option>
+        <option value="mr">मराठी</option>
+        <option value="bn">বাংলা</option>
+        <option value="gu">ગુજરાતી</option>
+        <option value="pa">ਪੰਜਾਬੀ</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- ============================================================= -->
+  <!-- 1. INITIAL LANDING VIEW: PATIENT REGISTRATION & LOGIN PORTAL   -->
+  <!-- ============================================================= -->
+  <div id="authGateSection" class="auth-gate-container">
+    <div class="auth-hero-banner">
+      <span class="auth-hero-badge">Clinical Decision Support</span>
+      <h2>Patient Registration & Diagnostic Portal</h2>
+      <p>Please register or log in below to access symptom assessment, ML-powered condition analysis, photo
+        classification, and personalized medical reports.</p>
+      <div class="features-pills">
+        <span class="feature-pill">🤖 Random Forest ML Model</span>
+        <span class="feature-pill">🌐 10 Indian Languages</span>
+        <span class="feature-pill">🎙 Voice Symptom Input</span>
+        <span class="feature-pill">📄 PDF Report Generator</span>
+        <span class="feature-pill">👨‍⚕️ Specialist Recommendation</span>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button type="button" id="tabBtnRegister" class="auth-tab active" onclick="showAuthTab('register')">
+          📝 Patient Registration
+        </button>
+        <button type="button" id="tabBtnLogin" class="auth-tab" onclick="showAuthTab('login')">
+          🔑 Patient Login
+        </button>
+      </div>
+
+      <div class="auth-body">
+        <!-- REGISTRATION PANE -->
+        <div id="paneRegister">
+          <h3 class="auth-section-title">Create Patient Account</h3>
+          <p class="auth-section-sub">Enter your details once to unlock personalized diagnosis & consultation history.
+          </p>
+
+          <form id="landingRegisterForm" onsubmit="handleRegister(event)">
+            <div id="landingRegisterAlert" class="alert-box" hidden></div>
+            <div class="form-row">
+              <label>
+                <span>Full Name *</span>
+                <input id="landingRegName" type="text" placeholder="" required>
+              </label>
+              <label>
+                <span>Email Address *</span>
+                <input id="landingRegEmail" type="email" placeholder="" required>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <span>Password * (min 6 characters)</span>
+                <input id="landingRegPassword" type="password" placeholder="Create a secure password" minlength="6"
+                  required>
+              </label>
+              <label>
+                <span>Confirm Password *</span>
+                <input id="landingRegConfirmPassword" type="password" placeholder="Re-enter your password" minlength="6"
+                  required>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <span>Phone Number</span>
+                <input id="landingRegPhone" type="tel" placeholder="">
+              </label>
+              <label>
+                <span>Blood Group</span>
+                <select id="landingRegBloodGroup">
+                  <option value="">Select Blood Group</option>
+                  <option>A+</option>
+                  <option>A-</option>
+                  <option>B+</option>
+                  <option>B-</option>
+                  <option>AB+</option>
+                  <option>AB-</option>
+                  <option>O+</option>
+                  <option>O-</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <span>Age (years)</span>
+                <input id="landingRegAge" type="number" min="0" max="120" placeholder="">
+              </label>
+              <label>
+                <span>Sex</span>
+                <select id="landingRegSex">
+                  <option value="">Select Sex</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-row">
+              <label class="full-field">
+                <span>Emergency Contact (Name & Phone)</span>
+                <input id="landingRegEmergency" type="text" placeholder="">
+              </label>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button type="submit" id="landingSubmitRegisterBtn" class="primary-btn"
+                style="width:100%;padding:13px;font-size:16px;">
+                Complete Registration & Enter Diagnosis Portal ➔
+              </button>
+            </div>
+            <p class="modal-switch-text">
+              Already have an account? <a href="javascript:void(0)" onclick="showAuthTab('login')">Log in here</a>
+            </p>
+          </form>
+        </div>
+
+        <!-- LOGIN PANE -->
+        <div id="paneLogin" hidden>
+          <h3 class="auth-section-title">Patient / Doctor Login</h3>
+          <p class="auth-section-sub">Sign in with your registered email and password to access your health profile.</p>
+
+          <form id="landingLoginForm" onsubmit="handleLogin(event)">
+            <div id="landingLoginAlert" class="alert-box" hidden></div>
+            <div style="margin-bottom: 14px;">
+              <label>
+                <span>Email Address</span>
+                <input id="landingLoginEmail" type="email" placeholder="name@example.com" required>
+              </label>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label>
+                <span>Password</span>
+                <input id="landingLoginPassword" type="password" placeholder="Enter your password" required>
+              </label>
+            </div>
+            <button type="submit" id="landingSubmitLoginBtn" class="primary-btn"
+              style="width:100%;padding:13px;font-size:16px;">
+              Log In & Access Diagnosis Portal ➔
+            </button>
+            <p class="modal-switch-text">
+              Don't have an account? <a href="javascript:void(0)" onclick="showAuthTab('register')">Register now</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- 2. MAIN DIAGNOSTIC WORKFLOW: UNLOCKED AFTER REGISTRATION/LOGIN -->
+  <!-- ============================================================= -->
+  <main id="mainDashboardSection" class="main-dashboard-container" hidden>
+    <div class="grid">
+      <section class="card">
+        <div class="card-header-row">
+          <h2 id="patientTitle">Patient Information</h2>
+          <div style="display:flex;align-items:center;gap:10px;">
+
+            <span id="patientStatusBadge" class="badge">Registered Patient</span>
+          </div>
+        </div>
+
+        <div id="patientProfileBanner" class="patient-profile-summary" hidden>
+          <strong>Patient:</strong> <span id="displayPatientName">-</span> |
+          <strong>Blood Group:</strong> <span id="displayBloodGroup">-</span> |
+          <strong>Emergency:</strong> <span id="displayEmergency">-</span>
+        </div>
+
+        <div class="row">
+          <label><span id="ageLabel">Age</span><input id="age" type="number" min="0" max="120"
+              placeholder="Age"></label>
+          <label><span id="sexLabel">Sex</span>
+            <select id="sex">
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label><span id="durationLabel">Duration (days)</span><input id="duration" type="number" min="0" max="3650"
+              value="1"></label>
+          <label><span id="severityLabel">Severity</span>
+            <select id="severity">
+              <option value="mild">Mild</option>
+              <option value="moderate">Moderate</option>
+              <option value="severe">Severe</option>
+            </select>
+          </label>
+        </div>
+
+        <h2 id="photoTitle" style="margin-top: 24px;">📸 Photo Upload & Clinical Image Diagnosis</h2>
+        <p class="note">Upload any medical photo (skin rash, eye redness, jaundice, ear canal, tooth decay, joint
+          swelling). The ML vision model will <strong>instantly detect symptoms and recommend the right
+            specialist</strong>.</p>
+        <div class="photo-box">
+          <input id="photo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+          <div style="margin-top: 12px;">
+            <img id="photoPreview" alt="Selected photo preview" hidden>
+          </div>
+          <div class="photo-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;">
+            <button id="diagnosePhotoBtn" type="button" class="btn-primary-photo"
+              style="display:inline-flex;align-items:center;gap:6px;padding:11px 20px;font-size:14px;border-radius:8px;">
+              🔬 Diagnose From Photo
+            </button>
+            <button id="uploadPhotoBtn" type="button"
+              style="display:inline-flex;align-items:center;gap:6px;padding:11px 18px;font-size:14px;border-radius:8px;">
+              💾 Save Photo
+            </button>
+            <button id="retrainPhotoBtn" type="button" class="btn-train-photo"
+              style="display:inline-flex;align-items:center;gap:6px;padding:11px 18px;font-size:14px;border-radius:8px;"
+              title="Retrain image model on clinical synthetic profiles">
+              ⚡ Retrain ML Model
+            </button>
+          </div>
+          <div id="photoStatus" style="margin-top: 10px;"></div>
+          <div id="photoResult"></div>
+        </div>
+
+        <h2 id="symptomTitle">Select Symptoms</h2>
+        <div class="searchline">
+          <input id="symptomSearch" placeholder="Search symptoms">
+          <button id="voiceBtn" type="button">🎙 Voice</button>
+        </div>
+        <div id="symptoms" class="symptoms"></div>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button id="predictBtn" class="primary" style="flex:1;">Predict</button>
+
+        </div>
+        <p class="note" id="disclaimer">Educational prototype — not a medical diagnosis.</p>
+      </section>
+
+      <section class="card result-card">
+        <h2 id="resultTitle">Prediction Result</h2>
+        <div id="empty">Select symptoms above and click Predict to run the ML analysis.</div>
+        <div id="result" hidden>
+          <div id="risk" class="risk"></div>
+          <h3 id="topTitle">Top 3 Predictions</h3>
+          <div id="predictions"></div>
+          <div id="specialistBox" class="pred" hidden></div>
+
+          <!-- DOCTOR & SPECIALIST LOCATION LOCATOR -->
+          <div id="specialistLocatorPanel" class="specialist-locator-panel" hidden>
+            <div class="locator-header">
+              <h4>📍 <span id="locatorTitle">Find Nearest Specialists & Clinics</span></h4>
+            </div>
+
+            <div class="locator-input-group">
+              <input id="specialistLocationInput" type="text"
+                placeholder="Enter City, Area, or Pincode (e.g. Mysuru, Hubli, Mumbai, Delhi, 570001)...">
+              <button type="button" id="searchLocationSpecialistBtn" class="locator-search-btn">🔍 Search</button>
+              <button type="button" id="gpsLocationBtn" class="gps-btn" title="Detect GPS location">📍 Use My
+                GPS</button>
+            </div>
+
+            <div class="locator-actions-row">
+              <span style="font-size:12px;font-weight:600;color:#64748b;">Quick Search:</span>
+              <button type="button" class="quick-filter-chip" onclick="searchSpecialistType('doctor')">🩺
+                Doctors</button>
+              <button type="button" class="quick-filter-chip" onclick="searchSpecialistType('hospital')">🏥 Top
+                Hospitals</button>
+              <button type="button" class="quick-filter-chip" onclick="searchSpecialistType('clinic')">🏢 Private
+                Clinics</button>
+              <button type="button" class="quick-filter-chip" onclick="searchSpecialistType('emergency')">🚑 24x7
+                Emergency</button>
+            </div>
+            <div id="locatorStatus" class="locator-status-text"></div>
+          </div>
+
+          <h3 id="whyTitle">Why this result?</h3>
+          <p id="explanation"></p>
+          <div class="actions accessibility-actions">
+            <button id="readAloudBtn" type="button" class="access-btn">🔊 Read Aloud</button>
+            <button id="pauseBtn" type="button" class="access-btn">⏸ Pause</button>
+            <button id="resumeBtn" type="button" class="access-btn">▶ Resume</button>
+            <button id="stopBtn" type="button" class="access-btn">⏹ Stop</button>
+            <button id="reportBtn">Generate PDF Report</button>
+            <button id="nearbyBtn">📍 Google Maps Search</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card full">
+        <div class="card-header-row">
+          <h2 id="historyTitle">Patient Diagnostic History</h2>
+          <button id="historyBtn">Load History</button>
+        </div>
+        <div id="history"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============================================================= -->
+  <!-- 3. PATIENT PROFILE MODAL (FOR UPDATES WHILE LOGGED IN)        -->
+  <!-- ============================================================= -->
+  <div id="profileModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalProfileTitle">Patient Profile</h2>
+        <button type="button" class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+      </div>
+
+      <form id="profileForm" onsubmit="handleProfileUpdate(event)">
+        <div id="profileAlert" class="alert-box" hidden></div>
+        <div class="form-row">
+          <label>
+            <span>Full Name</span>
+            <input id="profName" type="text" required>
+          </label>
+          <label>
+            <span>Email (Registered)</span>
+            <input id="profEmail" type="email" disabled class="disabled-input">
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            <span>Phone Number</span>
+            <input id="profPhone" type="tel">
+          </label>
+          <label>
+            <span>Blood Group</span>
+            <select id="profBloodGroup">
+              <option value="">Select Blood Group</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            <span>Age</span>
+            <input id="profAge" type="number" min="0" max="120">
+          </label>
+          <label>
+            <span>Sex</span>
+            <select id="profSex">
+              <option value="">Select Sex</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label class="full-field">
+            <span>Emergency Contact</span>
+            <input id="profEmergency" type="text">
+          </label>
+        </div>
+        <div class="form-row">
+          <label class="full-field">
+            <span>Medical History / Known Conditions</span>
+            <textarea id="profMedicalHistory" rows="2"></textarea>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" onclick="closeModal('profileModal')">Close</button>
+          <button type="submit" id="saveProfileBtn" class="primary-btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    window.SYMPTOMS = {{ symptoms | tojson }};
+    window.DISEASES = {{ diseases | tojson }};
+  </script>
+  <script src="/static/app.js?v=101"></script>
+</body>
+
+</html>
